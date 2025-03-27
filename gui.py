@@ -1,26 +1,11 @@
-import sympy
 import pygame
 import pygame_gui
 pygame.init()
 
-class Graftegner:
-    def __init__(self, parentSurface, size):
-        self.size = size
-
-        self.parentSurface = parentSurface
-        self.renderSurace = pygame.surface.Surface(size)
-
-    def draw(self, offset = [0, 0]):
-        self.renderSurace.fill([200, 200, 200])
-
-        self.parentSurface.blit(self.renderSurace, offset)
-
-def _graftegner_test():
+def _GUI_test():
     screen = pygame.display.set_mode([800, 450])
     clock = pygame.time.Clock()
     run = True
-
-    graftegner = Graftegner(screen, [200, 200])
 
     manager = pygame_gui.UIManager([800, 450])
 
@@ -67,10 +52,9 @@ def _graftegner_test():
 
         screen.fill([255, 255, 255])
 
-        graftegner.draw()
         manager.draw_ui(screen)
 
         pygame.display.update()
 
 if __name__ == "__main__":
-    _graftegner_test()
+    _GUI_test()
