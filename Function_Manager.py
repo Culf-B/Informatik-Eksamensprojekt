@@ -16,3 +16,7 @@ class Function_Manager:
     def change_function(self, func):
         # To be made
         d = 1
+        
+    def get_functions(self):
+        # To be made
+        d = 1
