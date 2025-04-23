@@ -1,11 +1,12 @@
 import socket
 
 class Client:
-    def __init__(self, host, port):
+    def __init__(self, host, port, timeout = 10):
         self.host = host
         self.port = port
         self.connected = False
         self.socket = None
+        self.timeout = timeout
 
     def connect(self):
         print("Connecting...")
@@ -15,6 +16,7 @@ class Client:
         try:
             self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.socket.connect((self.host, self.port))
+            self.socket.settimeout(self.timeout)
             self.connected = True
             print("Connected successfully")
         except socket.error as e:
@@ -34,7 +36,6 @@ class Client:
         except Exception as e:
             print(f"An unexpected error occurred: {e}")
         
-
     def disconnect(self):
         if self.socket or self.connected:
             try:
@@ -56,13 +57,15 @@ class Client:
             except Exception as e:
                 print(f"An unexpected error occurred: {e}")
 
-    def request(self, message, delimiter = '\n', encoding = 'utf-8', response_chunk_size = 1024):
+    def request(self, message, delimiter = '\\n', encoding = 'utf-8', response_chunk_size = 1024):
         print("Sending request...")
         if not self.connected:
             print("Was not connected to server, trying to connect...")
             self.connect()
 
-        self.sendall_with_errorlog(message.encode(encoding))
+        self.messageToSend = str(message) + str(delimiter)
+
+        self.sendall_with_errorlog(self.messageToSend.encode(encoding))
         try:
             self.response = self.receive_response(delimiter, encoding, response_chunk_size)
         except Exception as e:
@@ -99,7 +102,7 @@ class Client:
                 self.disconnect() # When no data is received, we assume the connection as been closed
                 return [1, None]
             else:
-                print("Chunk received successfully!")
+                print(f'Chunk received successfully! Chunk: {data}')
                 return [0, data]
         except socket.error as e:
             print(f"Socket error: {e}")
@@ -118,7 +121,7 @@ class Client:
         except Exception as e:
             print(f"An unexpected error occurred: {e}")
 
-    def receive_response(self, delimiter = '\n', encoding = 'utf-8', chunk_size = 1024):
+    def receive_response(self, delimiter = '\\n', encoding = 'utf-8', chunk_size = 1024):
         self.response_received = ''
 
         # Receive in chunks until delimiter is reached
@@ -131,8 +134,9 @@ class Client:
             self.decoded_response_chunk = self.response_chunk.decode(encoding)
             self.response_received += self.decoded_response_chunk
 
-            if delimiter in self.decoded_response_chunk:
+            if delimiter in self.response_received:
                 self.response_received = self.response_received.split(delimiter)[0] # Remove delimitter and potential stuff after it
+                print("Delimiter in response!")
                 break
 
         return self.response_received
@@ -148,3 +152,9 @@ class Client:
 
     def get_port(self):
         return self.port
+
+if __name__ == '__main__':
+    client = Client("10.147.131.246", 5000)
+    client.connect()
+    print(client.request(input(" -> ")))
+    client.disconnect()

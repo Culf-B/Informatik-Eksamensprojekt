@@ -3,12 +3,12 @@ import threading
 
 def handle_client(client_socket):
     while True:
-        data = client_socket.recv(64).decode()
+        data = client_socket.recv(64).decode('utf-8')
         if not data:
             break
         print('Received from client: ' + data)
         message = input(" -> ")  # take input from server
-        client_socket.send(message.encode())  # send message
+        client_socket.send(message.encode('utf-8'))  # send message
     client_socket.close()
 
 def server_program():
