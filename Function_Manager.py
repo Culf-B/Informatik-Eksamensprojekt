@@ -18,5 +18,4 @@ class Function_Manager:
         d = 1
         
     def get_functions(self):
-        # To be made
-        d = 1
+        return self.function_list
