@@ -1,5 +1,4 @@
 from sympy import *
-from keyboard import is_pressed
 import time
 
 functions = {
@@ -89,12 +88,15 @@ def add_function():
     except Exception as e:
         print(f"Error: {e}")
 
-# Keeps the program running, but only acts when there is a callback
-while True:
-    time.sleep(0.1)
+# This code is will only run when running this file (for testing) and not when running the whole program
+if __name__ == '__main__':
+    # Keeps the program running, but only acts when there is a callback
+    from keyboard import is_pressed
+    while True:
+        time.sleep(0.1)
 
-    if is_pressed('backspace'):
-        add_function()
+        if is_pressed('backspace'):
+            add_function()
 
-    if is_pressed('alt'):
-        break
+        if is_pressed('alt'):
+            break
