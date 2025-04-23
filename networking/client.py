@@ -2,7 +2,13 @@ import socket
 
 class Client:
     def __init__(self, host, port, timeout = 10):
+        '''
+        Client with some error handling
+        Leave host blank for localhost
+        '''
         self.host = host
+        if self.host == "":
+            self.host = socket.gethostname()
         self.port = port
         self.connected = False
         self.socket = None
@@ -154,7 +160,7 @@ class Client:
         return self.port
 
 if __name__ == '__main__':
-    client = Client("10.147.131.246", 5000)
+    client = Client("", 5000)
     client.connect()
     print(client.request(input(" -> ")))
     client.disconnect()
