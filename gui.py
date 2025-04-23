@@ -98,6 +98,7 @@ class UiHandler:
 
 def _GUI_test():
     screen = pygame.display.set_mode([800, 450])
+    pygame.display.set_caption("GUI test")
     clock = pygame.time.Clock()
     run = True
 
