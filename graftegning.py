@@ -10,6 +10,7 @@ clock = pygame.time.Clock()
 running = True
 pos_y = 0
 pos_x = 0
+zoom = 0
 while running:
  # poll for events
  # pygame.QUIT event means the user clicked X to close your window
@@ -32,12 +33,16 @@ while running:
         print("d is pressed")
         pos_x -= 1  
         
+    if event.type == pygame.MOUSEWHEEL:
+      zoom -= event.y
+      print(zoom)
 
     # fill the screen with a color to wipe away anything from last frame
     screen.fill("White")
     #tegner linjerne 
     pygame.draw.line(screen, "Black", (0, 360 + pos_y),(1280,360 + pos_y))
     pygame.draw.line(screen, "Black", (640 + pos_x, 0),(640 + pos_x,1200))
+    pygame.draw.rect(screen,"Black",pygame.Rect(640,360,zoom,zoom))
 
     # flip() the display to put your work on screen
     pygame.display.flip()
