@@ -22,9 +22,11 @@ class Function_Manager:
                 if func.func_name == func_name:
                     print("here")
                     self.change_function(input, i)
+                    break
                 else:
                     print("this")
                     self.make_new_function(input)
+                    break
         else:
             self.make_new_function(input)
             print("sigma")
