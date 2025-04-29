@@ -17,16 +17,15 @@ class Function_Manager:
         print(func_name)
 
         if func_name and len(self.function_list) > 0:
-            print("that")
+            self.function_found = False
             for i, func in enumerate(self.function_list):
                 if func.func_name == func_name:
                     print("here")
                     self.change_function(input, i)
+                    self.function_found = True
                     break
-                else:
-                    print("this")
-                    self.make_new_function(input)
-                    break
+            if self.function_found == False:
+                self.make_new_function(input)
         else:
             self.make_new_function(input)
             print("sigma")
