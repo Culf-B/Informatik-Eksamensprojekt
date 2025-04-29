@@ -38,5 +38,5 @@ class Camera:
 
         screen.blit(self.surface, blitpos)
 
-    def move(self):
+    def update(self):
         pass
