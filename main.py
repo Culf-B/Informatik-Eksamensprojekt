@@ -24,7 +24,7 @@ while run:
             if event.ui_element == ui.functionInput:
                 # Make new function
                 if event.text != "":
-                    functionManager.make_new_function(event.text)
+                    functionManager.choose_action(event.text)
                 
                 # Update ui
                 ui.functionInput.clear()

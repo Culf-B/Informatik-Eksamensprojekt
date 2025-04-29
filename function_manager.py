@@ -31,3 +31,8 @@ class Function_Manager:
         
     def get_functions(self):
         return self.function_list
+
+if __name__ == '__main__':
+    fm = Function_Manager()
+    fm.choose_action("f(x) = 5x")
+    print(fm.get_functions())
