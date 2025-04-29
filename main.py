@@ -19,11 +19,18 @@ while run:
         if event.type == pygame.QUIT or event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
             run = False
 
+        # Function has been inputted
         elif event.type == pygame_gui.UI_TEXT_ENTRY_FINISHED:
             if event.ui_element == ui.functionInput:
-                functionManager.make_new_function(event.text)
-                ui.functionInput.set_text("")
-                print("New function made!")
+                # Make new function
+                if event.text != "":
+                    functionManager.make_new_function(event.text)
+                
+                # Update ui
+                ui.functionInput.clear()
+                ui.functionInput.focus()
+                # Update ui function list
+                ui.inputWindow_updateFunctionList(functionManager.get_functions())
         
         ui.handleEvent(event)
 
