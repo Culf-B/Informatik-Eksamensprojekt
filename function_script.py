@@ -6,13 +6,14 @@ functions = {
 }
 
 class Function:
-    def __init__(self, input):
+    def __init__(self, input, manager):
         if input:
             self.inp = input.replace(" ", "")
         if not self.inp:
             raise ValueError("Input cannot be empty.")
         
         self.func_name = None
+        self.manager = manager
 
         # Checks if function is of form f(x) or not and runs accordingly
         if "=" in self.inp: # "f(x)" in the input
@@ -58,7 +59,7 @@ class Function:
         return modified_expr
 
     def get_unique_name(self, base="f"):
-        existing_names = [func.func_name for func in functions["functionList"] if func.func_name] # Get existing names
+        existing_names = [func.func_name for func in self.manager.get_functions() if func.func_name] # Get existing names
     
         # Give next available name to current function
         start_index = ord('f')

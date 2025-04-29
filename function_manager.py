@@ -6,7 +6,7 @@ class Function_Manager:
         self.function_list = []
         
     def make_new_function(self, input):
-        func = fs.Function(input)
+        func = fs.Function(input, self)
         self.function_list.append(func)
         
     def change_function(self, func, index):
