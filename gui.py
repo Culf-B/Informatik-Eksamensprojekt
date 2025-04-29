@@ -11,6 +11,34 @@ class Hiding_UIWindow(pygame_gui.elements.ui_window.UIWindow):
             )
         )
 
+class BetterUIScrollingContainer(pygame_gui.elements.ui_scrolling_container.UIScrollingContainer):
+    """
+    A version of UIScrollingContainer that ignores some errors in the hide() method.
+    """
+    def hide(self, hide_contents: bool = True):
+        """
+        In addition to the base UIElement.hide() - call hide() of owned container - _root_container.
+        All other sub-elements (view_container, scrollbars) are children of _root_container, so
+        it's visibility will propagate to them - there is no need to call their hide() methods
+        separately.
+
+        :param hide_contents: whether to also hide the contents of the container. Defaults to True.
+        """
+        if not self.visible:
+            return
+        try:
+            self._root_container.hide(hide_contents=False)
+            if self.vert_scroll_bar is not None:
+                self.vert_scroll_bar.hide()
+            if self.horiz_scroll_bar is not None:
+                self.horiz_scroll_bar.hide()
+
+            if self._view_container is not None:
+                self._view_container.hide(hide_contents)
+            super().hide()
+        except Exception as e:
+            print(f'Error caught when hiding UIScrollingContainer: {e}')
+
 class UiHandler:
     def __init__(self, parentSurface):
         self.parentSurface = parentSurface
@@ -20,8 +48,9 @@ class UiHandler:
             [self.parentSurface.get_width(), self.parentSurface.get_height() * 0.9]
         )
 
-
         self.manager = pygame_gui.UIManager(self.parentSurface.get_size())
+
+        self.functionLabels = []
 
         # Button to show inputwindow
         self.showInputWindowButton = pygame_gui.elements.ui_button.UIButton(
@@ -59,7 +88,23 @@ class UiHandler:
             relative_rect = pygame.Rect((0, 100), (300, 50)),
             text = "Funktioner",
             manager = self.manager,
-            container = self.inputWindow,
+            container = self.inputWindow
+        )
+
+        self.functionWindowFuncLabelContainer = None
+        self.remakeFunctionWindowFuncLabelContainer()
+        
+    
+    def remakeFunctionWindowFuncLabelContainer(self):
+        if self.functionWindowFuncLabelContainer != None:
+            self.functionWindowFuncLabelContainer.kill()
+        self.functionWindowFuncLabelContainer = BetterUIScrollingContainer(
+            relative_rect = pygame.Rect((0, 150), (300, 225)),
+            manager = self.manager,
+            allow_scroll_x = False,
+            allow_scroll_y = True,
+            visible = True,
+            container = self.inputWindow
         )
     
     def handleEvent(self, event):
@@ -95,6 +140,24 @@ class UiHandler:
         self.manager.draw_ui(self.renderSurface)
 
         self.parentSurface.blit(self.renderSurface, [0, 0])
+
+    def inputWindow_updateFunctionList(self, functionList):
+        for element in self.functionLabels:
+            element.kill()
+        self.functionLabels = []
+        self.remakeFunctionWindowFuncLabelContainer()
+
+        for i in range(len(functionList)):
+            self.functionLabels.append(
+                pygame_gui.elements.ui_label.UILabel(
+                    relative_rect = pygame.Rect((0, 50 * i), (300, 50)),
+                    text = f'{functionList[i].func_name}({functionList[i].var_name}) = {functionList[i].func}',
+                    manager = self.manager,
+                    container = self.functionWindowFuncLabelContainer
+                )
+            )
+
+        self.functionWindowFuncLabelContainer.set_scrollable_area_dimensions((300, 50 * len(functionList)))
 
 def _GUI_test():
     screen = pygame.display.set_mode([800, 450])
