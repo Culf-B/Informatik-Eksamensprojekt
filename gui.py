@@ -2,6 +2,8 @@ import pygame
 import pygame_gui
 pygame.init()
 
+import graphTools
+
 class Hiding_UIWindow(pygame_gui.elements.ui_window.UIWindow):
     def on_close_window_button_pressed(self):
         self.hide()
@@ -47,6 +49,8 @@ class UiHandler:
         self.graphicsSurface = pygame.surface.Surface(
             [self.parentSurface.get_width(), self.parentSurface.get_height() * 0.9]
         )
+
+        self.graphCam = graphTools.Camera(size = self.graphicsSurface.get_size())
 
         self.manager = pygame_gui.UIManager(self.parentSurface.get_size())
 
@@ -123,6 +127,8 @@ class UiHandler:
         self.manager.process_events(event)
 
     def update(self, delta):
+        self.graphCam.update()
+        
         if self.inputWindow.visible:
             # Make sure top of window doesn't go out of bounds
             # TODO make sure there is no way to move top bar out of bounds
@@ -132,13 +138,13 @@ class UiHandler:
         self.manager.update(delta)
 
     def draw(self):
-        self.renderSurface.fill([255, 255, 255])
+        self.renderSurface.fill([200, 200, 200])
         self.graphicsSurface.fill([200, 200, 200])
 
+        self.graphCam.render(self.graphicsSurface, [0, 0])
         self.renderSurface.blit(self.graphicsSurface, [0, 0])
 
         self.manager.draw_ui(self.renderSurface)
-
         self.parentSurface.blit(self.renderSurface, [0, 0])
 
     def inputWindow_updateFunctionList(self, functionList):
