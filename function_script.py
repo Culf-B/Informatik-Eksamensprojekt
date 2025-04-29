@@ -1,10 +1,6 @@
 from sympy import *
 import time
 
-functions = {
-    "functionList": [],
-}
-
 class Function:
     def __init__(self, input, manager):
         if input:
@@ -74,30 +70,3 @@ class Function:
             if new_name not in existing_names:
                 return new_name
             index += 1
-
-# Action handlers
-def add_function():
-    try:
-        time.sleep(0.3)
-        f = Function()
-        functions["functionList"].append(f)
-        latest_func = functions["functionList"][-1]
-        print(f"\nFunction Name: {latest_func.func_name}")
-        print(f"Variable: {latest_func.var}")
-        print(f"Function: {latest_func.func}")
-        print(f"Function output at {latest_func.var} = 3: {latest_func.yFunc(3)}\n")
-    except Exception as e:
-        print(f"Error: {e}")
-
-# This code is will only run when running this file (for testing) and not when running the whole program
-if __name__ == '__main__':
-    # Keeps the program running, but only acts when there is a callback
-    from keyboard import is_pressed
-    while True:
-        time.sleep(0.1)
-
-        if is_pressed('backspace'):
-            add_function()
-
-        if is_pressed('alt'):
-            break
