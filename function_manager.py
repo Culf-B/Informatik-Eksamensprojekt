@@ -12,7 +12,7 @@ class Function_Manager:
             lhs = input.split("=")[0]
             func_name = lhs[0]  # 'f' in "f(x)"
 
-        if func_name:
+        if func_name and func_name in self.function_list:
             for i, func in enumerate(self.function_list):
                 if func.func_name == func_name:
                     self.change_function(input, i)
@@ -28,11 +28,11 @@ class Function_Manager:
         func = fs.Function(input, self, existing_name)
         self.function_list[index] = func
 
-        
     def get_functions(self):
         return self.function_list
 
 if __name__ == '__main__':
     fm = Function_Manager()
     fm.choose_action("f(x) = 5x")
-    print(fm.get_functions())
+    fm.choose_action("f(x) = 3*x^2")
+    print((fm.get_functions()[0].func), (fm.get_functions()[1].func))
