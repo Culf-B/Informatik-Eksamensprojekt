@@ -1,8 +1,7 @@
 from sympy import *
-import time
 
 class Function:
-    def __init__(self, input, manager):
+    def __init__(self, input, manager, existing_name=None):
         if input:
             self.inp = input.replace(" ", "")
         if not self.inp:
@@ -11,25 +10,26 @@ class Function:
         self.func_name = None
         self.manager = manager
 
-        # Checks if function is of form f(x) or not and runs accordingly
-        if "=" in self.inp: # "f(x)" in the input
+        if "=" in self.inp:
             self.lhs, self.rhs = self.inp.split("=")
-            self.var_name = self.lhs[2] if len(self.lhs) > 2 else "x" # Takes third index, which would be x in "f(x)" 
-            desired_name = self.lhs[0] # Takes first index, which would be f in "f(x)" 
-            self.func_name = self.get_unique_name(desired_name)
+            self.var_name = self.lhs[2] if len(self.lhs) > 2 else "x"
+            desired_name = self.lhs[0]
+
+            self.func_name = existing_name if existing_name else self.get_unique_name(desired_name)
             self.func = self.rhs
-        else: # No "f(x)" in the input
+        else:
             self.func = self.inp 
             self.var_name = self.detect_variable(self.func)
-            self.func_name = self.get_unique_name()
+            self.func_name = existing_name if existing_name else self.get_unique_name() # Checks if input had existing name in function list
 
-        self.var = symbols(self.var_name) # Initializes variable as symbol in sympy
-        self.func = self.fix_multiplication(self.func) # Standardize function so sympy can sympify the expression
+        self.var = symbols(self.var_name)
+        self.func = self.fix_multiplication(self.func)
 
         try:
-            self.func = sympify(self.func) # Recognize expression and set expression as function
+            self.func = sympify(self.func)
         except Exception as e:
             raise ValueError(f"Failed to parse expression '{self.func}': {e}")
+
 
     def yFunc(self, xVal):
         return self.func.subs({self.var: xVal})
