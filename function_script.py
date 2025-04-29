@@ -22,9 +22,11 @@ class Function:
             self.var_name = self.detect_variable(self.func)
             self.func_name = existing_name if existing_name else self.get_unique_name() # Checks if input had existing name in function list
 
+        print(self.func)
         self.var = symbols(self.var_name)
         self.func = self.fix_multiplication(self.func)
-
+        print(self.func)
+        
         try:
             self.func = sympify(self.func)
         except Exception as e:
@@ -49,7 +51,7 @@ class Function:
 
             if i < length - 1: # Loops through the length of the expression
                 next_char = expr[i + 1]
-                if (current.isdigit() or current.isalpha()) and (next_char.isalpha() or next_char.isdigit()): # Checks if the expression has a situation like this: 2x or x2
+                if (current.isdigit() and next_char.isalpha()) or (current.isalpha() and next_char.isdigit() or current.isalpha() and next_char.isalpha()): # Checks if the expression has a situation like this: 2x or x2
                     modified_expr += "*" # Inserts multiplication symbol for the sympify function
 
         return modified_expr
