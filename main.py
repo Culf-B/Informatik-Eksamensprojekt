@@ -3,7 +3,7 @@ import pygame_gui
 pygame.init()
 
 import gui
-import Function_Manager
+import function_manager
 
 screen = pygame.display.set_mode([800, 450])
 pygame.display.set_caption("Multiplayer graftegner")
@@ -11,7 +11,7 @@ clock = pygame.time.Clock()
 run = True
 
 ui = gui.UiHandler(screen)
-functionManager = Function_Manager.Function_Manager()
+functionManager = function_manager.Function_Manager()
 
 while run:
     delta = clock.tick(60) / 1000
