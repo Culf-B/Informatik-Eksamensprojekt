@@ -37,9 +37,15 @@ class Function:
         return self.func.subs({self.var: xVal})
 
     def detect_variable(self, expression_str):
-        expr = sympify(self.fix_multiplication(expression_str)) # Makes a sympy expression where letters are variables
-        vars_in_expr = list(expr.free_symbols) # Checks expression for variable 
-        return str(vars_in_expr[0]) if vars_in_expr else "x" # Returns variable to set the variable
+        expr = sympify(self.fix_multiplication(expression_str))
+        vars_in_expr = list(expr.free_symbols) # Find all possible variables in expression
+
+        # Filter out contants in math
+        ignored_symbols = {'e', 'p', 'i'}
+        filtered_vars = [v for v in vars_in_expr if str(v) not in ignored_symbols]
+
+        return str(filtered_vars[0]) if filtered_vars else "x"
+
 
     def fix_multiplication(self, expr):
         modified_expr = ""
