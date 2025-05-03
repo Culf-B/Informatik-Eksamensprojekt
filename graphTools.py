@@ -59,6 +59,7 @@ class Camera:
     def __init__(self, pos = [0, 0], zoomAmount = 1, size = [500, 500]):
         self.pos = pos
         self.zoomAmount = zoomAmount
+        self.moveSpeed = 10
         
         # Calculate actual zoom scaling level
         if self.zoomAmount > 0:
@@ -90,14 +91,14 @@ class Camera:
     def update(self):
         self.pressed = pygame.key.get_pressed()
         if self.pressed[pygame.K_w]:
-            self.pos[1] -= 1 / self.zoom
+            self.pos[1] -= self.moveSpeed / self.zoom
         if self.pressed[pygame.K_s]:
-            self.pos[1] += 1 / self.zoom
+            self.pos[1] += self.moveSpeed / self.zoom
 
         if self.pressed[pygame.K_a]:
-            self.pos[0] -= 1 / self.zoom
+            self.pos[0] -= self.moveSpeed / self.zoom
         if self.pressed[pygame.K_d]:
-            self.pos[0] += 1 / self.zoom
+            self.pos[0] += self.moveSpeed / self.zoom
     
     def handleEvent(self, event):
         if event.type == pygame.MOUSEWHEEL:
