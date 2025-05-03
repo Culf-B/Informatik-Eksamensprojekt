@@ -124,7 +124,8 @@ class UiHandler:
             if event.ui_element == self.inputWindow:
                 self.showInputWindowButton.set_text("Vis funktions vindue")
 
-        self.manager.process_events(event)
+        self.manager.process_events(event) # Pass events onto pygame_gui's eventhandler
+        self.graphCam.handleEvent(event) # Pass events onto graphCams eventhandler
 
     def update(self, delta):
         self.graphCam.update()
