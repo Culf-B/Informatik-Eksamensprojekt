@@ -38,29 +38,48 @@ class Function:
 
     def detect_variable(self, expression_str):
         expr = sympify(self.fix_multiplication(expression_str))
-        vars_in_expr = list(expr.free_symbols) # Find all possible variables in expression
+        self.vars_in_expr = list(expr.free_symbols) # Find all possible variables in expression
 
         # Filter out contants in math
         ignored_symbols = {'e', 'p', 'i'}
-        filtered_vars = [v for v in vars_in_expr if str(v) not in ignored_symbols]
+        filtered_vars = [v for v in self.vars_in_expr if str(v) not in ignored_symbols]
 
         return str(filtered_vars[0]) if filtered_vars else "x"
 
 
     def fix_multiplication(self, expr):
-        modified_expr = ""
-        length = len(expr)
+        known_funcs = ['sin', 'cos', 'tan', 'exp', 'log', 'sqrt']
+        i = 0
+        result = ""
+        while i < len(expr):
+            # Check for known function in expression
+            matched_func = None
+            for func in known_funcs:
+                if expr[i:i+len(func)] == func: # Checks if any set of consecutive indexes matches a known function
+                    matched_func = func
+                    break # Stops the current iteration of the while loop
 
-        for i in range(length):
+            if matched_func:
+                result += matched_func
+                i += len(matched_func)
+                
+                # Check if function is immediately followed by a variable and fix syntax
+                if i < len(expr) and expr[i].isalpha():
+                    result += "(" + expr[i] + ")"
+                    i += 1
+                continue
+
+            # Handle implicit multiplication
             current = expr[i]
-            modified_expr += current
+            result += current
 
-            if i < length - 1: # Loops through the length of the expression
+            if i < len(expr) - 1:
                 next_char = expr[i + 1]
-                if (current.isdigit() and next_char.isalpha()) or (current.isalpha() and next_char.isdigit() or current.isalpha() and next_char.isalpha()): # Checks if the expression has a situation like this: 2x or x2
-                    modified_expr += "*" # Inserts multiplication symbol for the sympify function
+                if ((current.isdigit() and next_char.isalpha()) or (current.isalpha() and next_char.isdigit()) or (current.isalpha() and next_char.isalpha())): # Fixes multiplication for cases: 2x, x2, xy
+                    result += "*"
 
-        return modified_expr
+            i += 1
+        return result
 
     def get_unique_name(self, base="f"):
         existing_names = [func.func_name for func in self.manager.get_functions() if func.func_name] # Get existing names
