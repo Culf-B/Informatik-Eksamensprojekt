@@ -4,7 +4,7 @@ pygame.init()
 
 import gui
 import function_manager
-from networking import client, sharedObject
+from networking import client
 
 screen = pygame.display.set_mode([800, 450])
 pygame.display.set_caption("Multiplayer graftegner")
@@ -14,13 +14,27 @@ run = True
 ui = gui.UiHandler(screen)
 functionManager = function_manager.Function_Manager()
 
+def functionListUpdated():
+    # Update ui
+    ui.functionInput.clear()
+    ui.functionInput.focus()
+    # Update ui function list
+    ui.inputWindow_updateFunctionList(functionManager.get_functions())
+
 # Connect to server and get all functions
 connectionClient = client.Client(
     input("Server IP (leave blank for any local ip): "),
     int(input("Server address: "))
 )
 connectionClient.connect()
-print(connectionClient.request("functions"))
+
+# Load functions from the server
+response = connectionClient.request("functions")
+if response["status"] == 200:
+    for functionString in response["content"]:
+        functionManager.choose_action(functionString)
+
+functionListUpdated()
 
 while run:
     delta = clock.tick(60) / 1000
@@ -36,11 +50,8 @@ while run:
                     functionManager.choose_action(event.text)
                 
                 # Update ui
-                ui.functionInput.clear()
-                ui.functionInput.focus()
-                # Update ui function list
-                ui.inputWindow_updateFunctionList(functionManager.get_functions())
-        
+                functionListUpdated()
+                
         # Pass events onto UIHandlers eventhandler
         ui.handleEvent(event)
 

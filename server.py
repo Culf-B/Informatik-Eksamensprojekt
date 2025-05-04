@@ -40,7 +40,7 @@ class Server:
             self.loadedFileData = json.load(f)
 
         for function in self.loadedFileData["functions"]:
-            self.function_manager.make_new_function(function)
+            self.function_manager.choose_action(function)
         
     def saveToSaveFile(self, filename):
         # Load functions to file

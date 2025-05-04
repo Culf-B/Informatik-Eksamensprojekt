@@ -1,4 +1,5 @@
 import socket
+import json
 
 from . import connectionBaseplate
 
@@ -55,10 +56,11 @@ class Client(connectionBaseplate.Connection):
 
         self.sendall_with_errorlog(self.messageToSend.encode(encoding))
         try:
-            self.response = self.receive_response(delimiter, encoding, response_chunk_size)
+            self.responseString = self.receive_response(delimiter, encoding, response_chunk_size)
+            self.response = json.loads(self.responseString)
         except Exception as e:
             print(f'Error when receiving response: {e}')
-            self.response = None
+            self.response = {"status": 0}
         return self.response
 
     def receive_response(self, delimiter = '\\n', encoding = 'utf-8', chunk_size = 1024):
