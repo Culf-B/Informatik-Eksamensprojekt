@@ -9,6 +9,7 @@ class Connection:
         self.socket = socket
         self.timeout = timeout
         self.connected = connected
+        self.socket.settimeout(self.timeout)
         
     def disconnect(self):
         if self.socket or self.connected:
@@ -62,19 +63,10 @@ class Connection:
             else:
                 print(f'Chunk received successfully! Chunk: {data}')
                 return [0, data]
+        except socket.timeout as e:
+            print(f'Socket timed out')
+            return [1, None]
         except socket.error as e:
             print(f"Socket error: {e}")
-        except BlockingIOError as e:
-            print(f"Blocking I/O error: {e}")
-        except OSError as e:
-            print(f"OS error: {e}")
-        except ConnectionResetError as e:
-            print(f"Connection reset by peer: {e}")
-        except ConnectionAbortedError as e:
-            print(f"Connection aborted by local host: {e}")
-        except TimeoutError as e:
-            print(f"Timeout error: {e}")
-        except BrokenPipeError as e:
-            print(f"Broken pipe error: {e}")
         except Exception as e:
             print(f"An unexpected error occurred: {e}")

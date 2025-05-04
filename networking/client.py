@@ -1,6 +1,6 @@
 import socket
 
-import connectionBaseplate
+from . import connectionBaseplate
 
 class Client(connectionBaseplate.Connection):
     def __init__(self, host, port, timeout = 10):
@@ -67,10 +67,13 @@ class Client(connectionBaseplate.Connection):
         # Receive in chunks until delimiter is reached
         while True:
             self.response_message = self.receive_with_errorlog(chunk_size)
-            if self.response_message[0] == 0:
-                self.response_chunk = self.response_message[1]
+            if self.response_message != None:
+                if self.response_message[0] == 0:
+                    self.response_chunk = self.response_message[1]
+                else:
+                    raise Exception("Empty response chunk!")
             else:
-                raise Exception("Error when receiving response, empty response!")
+                raise Exception("Error when receiving response chunk!")
             self.decoded_response_chunk = self.response_chunk.decode(encoding)
             self.response_received += self.decoded_response_chunk
 

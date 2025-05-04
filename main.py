@@ -4,6 +4,7 @@ pygame.init()
 
 import gui
 import function_manager
+from networking import client, sharedObject
 
 screen = pygame.display.set_mode([800, 450])
 pygame.display.set_caption("Multiplayer graftegner")
@@ -12,6 +13,14 @@ run = True
 
 ui = gui.UiHandler(screen)
 functionManager = function_manager.Function_Manager()
+
+# Connect to server and get all functions
+connectionClient = client.Client(
+    input("Server IP (leave blank for any local ip): "),
+    int(input("Server address: "))
+)
+connectionClient.connect()
+print(connectionClient.request("functions"))
 
 while run:
     delta = clock.tick(60) / 1000
@@ -43,3 +52,6 @@ while run:
 
     pygame.display.update()
     clock.tick(60)
+
+# Disconnect from server when closing program
+connectionClient.disconnect()
