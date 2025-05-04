@@ -41,6 +41,12 @@ class Function_Manager:
 
     def get_functions(self):
         return self.function_list
+    
+    def get_function_strings(self):
+        strings = []
+        for function in self.function_list:
+            strings.append(f'{function.func_name}({function.var}) = {function.func}')
+        return strings
 
 if __name__ == '__main__':
     fm = Function_Manager()

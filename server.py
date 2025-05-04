@@ -1,17 +1,13 @@
 import socket
 import threading
+import json
+import os
 
-try:
-    from . import connectionBaseplate
-    from . import sharedObject
-except ImportError as e:
-    print(f'ImportError! {e}. Trying another way of import...')
-    import connectionBaseplate
-    import sharedObject
-    print('Importing finished successfully!')
+from networking import connectionBaseplate
+import function_manager
 
 class Server:
-    def __init__(self, host, port, timeout = 10, listener_backlog = 5):
+    def __init__(self, host, port, timeout = 10, listener_backlog = 5, file_to_load = None):
         '''
         Socket server with error handling
         Leave host blank for localhost 
@@ -31,8 +27,26 @@ class Server:
         self.connectedClients = []
         self.threads = []
         self.stop_event = threading.Event()
+        
+        self.savefile = file_to_load
+        self.function_manager = function_manager.Function_Manager()
+        if self.savefile != None:
+            self.loadFromSaveFile(self.savefile)
 
-        self.sharedObjectEventHandler = sharedObject.SharedObjectEventHandler()
+    def loadFromSaveFile(self, filename):
+        # Load functions from file
+        self.dir = os.path.abspath( os.path.dirname( __file__ ) )
+        with open(os.path.join(self.dir, "saved_data", filename), "r") as f:
+            self.loadedFileData = json.load(f)
+
+        for function in self.loadedFileData["functions"]:
+            self.function_manager.make_new_function(function)
+        
+    def saveToSaveFile(self, filename):
+        # Load functions to file
+        self.dir = os.path.abspath( os.path.dirname( __file__ ) )
+        with open(os.path.join(self.dir, "saved_data", filename), "w") as f:
+            json.dump({"functions": self.function_manager.get_function_strings()}, f)
 
     def listen(self):
         '''
@@ -49,7 +63,7 @@ class Server:
                 print(f'Listener timed out, expected every {self.timeout} seconds')
                 continue
 
-            client_connection_object = ClientHandler(client_socket, addr, self.stop_event, timeout = self.timeout)
+            client_connection_object = ClientHandler(client_socket, addr, self.stop_event, responseGenerator = self.responseGenerator, timeout = self.timeout)
 
             client_handler = threading.Thread(target = client_connection_object.doClientConnection)
             client_handler.start()
@@ -58,8 +72,14 @@ class Server:
             self.connectedClients.append(client_connection_object)
 
     def stop(self):
+
         self.stop_event.set()
         print(f'Stopping all connections. Waiting for timeout, max {self.timeout} seconds...')
+
+        if self.savefile != None:
+            print("Saving data...")
+            self.saveToSaveFile(self.savefile)
+            print("Data saved!")
 
         for i, t in enumerate(self.threads):
             if t.is_alive():
@@ -69,11 +89,32 @@ class Server:
         self.socket.close()
         print("All threads and server closed successfully!")
 
+    def responseGenerator(self, request):
+        try:
+            if request == "functions":
+                responseObject = {
+                    "status": 200,
+                    "content": self.function_manager.get_function_strings()
+                }
+            else:
+                responseObject = {
+                    "status": 404
+                }
+        except Exception as e:
+            print(f'Exception occured when generation response!\nRequest: {request}\nError: {e}')
+            responseObject = {
+                "status": 500
+            }
+        finally:
+            responseString = json.dumps(responseObject)
+            return responseString
+
 class ClientHandler(connectionBaseplate.Connection):
-    def __init__(self, socket, address, stop_event, timeout = 10):
+    def __init__(self, socket, address, stop_event, responseGenerator, timeout = 10):
         self.socket = socket
         self.address = address
         self.stop_event = stop_event
+        self.responseGenerator = responseGenerator
 
         super().__init__(socket, timeout = timeout)
     
@@ -91,8 +132,8 @@ class ClientHandler(connectionBaseplate.Connection):
                     try:
                         self.request_received = self.receive_request()
                         if self.request_received != None:
-                            print(self.request_received)
-                            self.serverToClientComms("ok!")
+                            self.responseToSend = self.responseGenerator(self.request_received)
+                            self.serverToClientComms(self.responseToSend)
                     except Exception as e:
                         print(f'Disconnecting! Reason: {e}')
                         self.disconnect()
@@ -136,14 +177,14 @@ class ClientHandler(connectionBaseplate.Connection):
         return self.response_received
 
 if __name__ == '__main__':
-
     addr = ""
-    port = 5000
+    port = 4000
     print(f'Starting server on addr: {addr}, port: {port}')
-    server = Server("", 5000)
+    server = Server(addr, port, file_to_load = "test_save.json")
     try:
         server.listen()
     except KeyboardInterrupt:
         print("KeyboardInterupt! Initiating shutdown...")
         server.stop()
         print("Shutdown complete!")
+    
