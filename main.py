@@ -32,6 +32,7 @@ while run:
                 # Update ui function list
                 ui.inputWindow_updateFunctionList(functionManager.get_functions())
         
+        # Pass events onto UIHandlers eventhandler
         ui.handleEvent(event)
 
     ui.update(delta)
@@ -41,3 +42,4 @@ while run:
     ui.draw()
 
     pygame.display.update()
+    clock.tick(60)

@@ -124,7 +124,8 @@ class UiHandler:
             if event.ui_element == self.inputWindow:
                 self.showInputWindowButton.set_text("Vis funktions vindue")
 
-        self.manager.process_events(event)
+        self.manager.process_events(event) # Pass events onto pygame_gui's eventhandler
+        self.graphCam.handleEvent(event) # Pass events onto graphCams eventhandler
 
     def update(self, delta):
         self.graphCam.update()
@@ -148,18 +149,29 @@ class UiHandler:
         self.parentSurface.blit(self.renderSurface, [0, 0])
 
     def inputWindow_updateFunctionList(self, functionList):
+        # Delete all labels and update ui
         for element in self.functionLabels:
             element.kill()
         self.functionLabels = []
         self.remakeFunctionWindowFuncLabelContainer()
+        # Delete all function render objects on graph
+        self.graphCam.deleteAllFunctionRenderObjects()
 
+        # Remake all objects from updated functionList
         for i in range(len(functionList)):
+            # Add UI label
             self.functionLabels.append(
                 pygame_gui.elements.ui_label.UILabel(
                     relative_rect = pygame.Rect((0, 50 * i), (300, 50)),
                     text = f'{functionList[i].func_name}({functionList[i].var_name}) = {functionList[i].func}',
                     manager = self.manager,
                     container = self.functionWindowFuncLabelContainer
+                )
+            )
+            # Add renderobject to graph
+            self.graphCam.addRenderObject(
+                graphTools.Function(
+                    functionList[i]
                 )
             )
 
