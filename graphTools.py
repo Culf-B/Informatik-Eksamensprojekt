@@ -41,7 +41,9 @@ class Function(RenderObject):
             self.currentX = self.startPos[0] + (i / (self.resolution - 1)) * self.drawWidth
             self.currentY = self.functionObject.yFunc(self.currentX)
 
-            
+            # Ignore complex numbers
+            if not self.currentY.is_real:
+                continue
 
             # Screen position
             self.screenPos = camera.getPosFromGraphCoords([self.currentX, self.currentY])
