@@ -91,11 +91,22 @@ class Server:
 
     def responseGenerator(self, request):
         try:
-            if request == "functions":
+            loadedRequest = json.loads(request)
+            if loadedRequest["action"] == "GET":
                 responseObject = {
                     "status": 200,
                     "content": self.function_manager.get_function_strings()
                 }
+            elif loadedRequest["action"] == "POST":
+                self.function_manager.choose_action(loadedRequest["content"])
+                responseObject = {
+                    "status": 200,
+                    "content": self.function_manager.get_function_strings()
+                }
+                for client in self.connectedClients:
+                    if client.connected:
+                        client.serverToClientComms(json.dumps(responseObject))
+                responseObject = None
             else:
                 responseObject = {
                     "status": 404
@@ -106,8 +117,11 @@ class Server:
                 "status": 500
             }
         finally:
-            responseString = json.dumps(responseObject)
-            return responseString
+            if responseObject != None:
+                responseString = json.dumps(responseObject)
+                return responseString
+            else:
+                return responseObject
 
 class ClientHandler(connectionBaseplate.Connection):
     def __init__(self, socket, address, stop_event, responseGenerator, timeout = 10):
@@ -133,7 +147,8 @@ class ClientHandler(connectionBaseplate.Connection):
                         self.request_received = self.receive_request()
                         if self.request_received != None:
                             self.responseToSend = self.responseGenerator(self.request_received)
-                            self.serverToClientComms(self.responseToSend)
+                            if self.responseToSend != None:
+                                self.serverToClientComms(self.responseToSend)
                     except Exception as e:
                         print(f'Disconnecting! Reason: {e}')
                         self.disconnect()

@@ -72,17 +72,21 @@ class Camera:
         self.size = size
         self.surface = pygame.surface.Surface(self.size)
 
-        self.renderObjects = []
+        self.permanentRenderObjects = []
         self.axis = Axis()
-        self.renderObjects.append(self.axis)
+        self.permanentRenderObjects.append(self.axis)
 
+        self.functionRenderObjects = []
+        
         self.collisionRect = pygame.Rect([0, 0, self.size[0], self.size[1]])
 
     def render(self, screen, blitpos):
         self.surface.fill([255, 255, 255]) # Clear background
 
         # Render renderobjects to surface
-        for obj in self.renderObjects:
+        for obj in self.permanentRenderObjects:
+            obj.draw(self.surface, self.pos[0], self.pos[1], self.zoom, self.size, self)
+        for obj in self.functionRenderObjects:
             obj.draw(self.surface, self.pos[0], self.pos[1], self.zoom, self.size, self)
 
         screen.blit(self.surface, blitpos)
@@ -139,12 +143,10 @@ class Camera:
         ]
 
     def deleteAllFunctionRenderObjects(self):
-        for i, renderObject in enumerate(self.renderObjects): # Enumerate should update i when deletion has happened
-            if isinstance(renderObject, Function):
-                del self.renderObjects[i]
+        self.functionRenderObjects = []
 
-    def addRenderObject(self, obj):
-        self.renderObjects.append(obj)
+    def addFunctionRenderObject(self, obj):
+        self.functionRenderObjects.append(obj)
 
 if __name__ == '__main__': 
     pygame.init()

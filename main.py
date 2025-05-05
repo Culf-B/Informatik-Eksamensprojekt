@@ -1,6 +1,7 @@
 import pygame
 import pygame_gui
 pygame.init()
+import json
 
 import gui
 import function_manager
@@ -13,6 +14,7 @@ run = True
 
 ui = gui.UiHandler(screen)
 functionManager = function_manager.Function_Manager()
+isFunctionlistUpdated = True
 
 def functionListUpdated():
     # Update ui
@@ -21,18 +23,41 @@ def functionListUpdated():
     # Update ui function list
     ui.inputWindow_updateFunctionList(functionManager.get_functions())
 
+def updateCallback(data):
+    global isFunctionlistUpdated
+    try:
+        print(f'Data received: {data}')
+        objectifiedData = json.loads(data)
+        print("test 1")
+        if objectifiedData["status"] == 200:
+            print("test 2")
+            functionManager.delete_all_functions()
+            print("test 3")
+            for functionString in objectifiedData["content"]:
+                print("test 4", functionString)
+                functionManager.choose_action(functionString)
+
+        isFunctionlistUpdated = True
+        
+    except Exception as e:
+        print(f'Error when parsing received data: {e}')
+
 # Connect to server and get all functions
 connectionClient = client.Client(
     input("Server IP (leave blank for any local ip): "),
-    int(input("Server address: "))
+    int(input("Server address: ")),
+    updateCallback
 )
 connectionClient.connect()
 
 # Load functions from the server
-response = connectionClient.request("functions")
-if response["status"] == 200:
-    for functionString in response["content"]:
-        functionManager.choose_action(functionString)
+connectionClient.request(
+    json.dumps(
+        {
+            "action": "GET"
+        }
+    )
+)
 
 functionListUpdated()
 
@@ -52,8 +77,23 @@ while run:
                 # Update ui
                 functionListUpdated()
                 
+                # Send to server
+                connectionClient.request(
+                    json.dumps(
+                        {
+                            "action": "POST",
+                            "content": event.text
+                        }
+                    )
+                )
+
         # Pass events onto UIHandlers eventhandler
         ui.handleEvent(event)
+
+    if isFunctionlistUpdated:
+        print("Updating ui", functionManager.get_function_strings())
+        isFunctionlistUpdated = False
+        functionListUpdated()
 
     ui.update(delta)
 

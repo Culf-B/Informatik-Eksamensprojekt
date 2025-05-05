@@ -169,7 +169,7 @@ class UiHandler:
                 )
             )
             # Add renderobject to graph
-            self.graphCam.addRenderObject(
+            self.graphCam.addFunctionRenderObject(
                 graphTools.Function(
                     functionList[i]
                 )

@@ -45,6 +45,9 @@ class Function_Manager:
         for function in self.function_list:
             strings.append(f'{function.func_name}({function.var}) = {function.func}')
         return strings
+    
+    def delete_all_functions(self):
+        self.function_list = []
 
 if __name__ == '__main__':
     fm = Function_Manager()

@@ -1,10 +1,12 @@
 import socket
 import json
+import threading
+from time import sleep
 
 from . import connectionBaseplate
 
 class Client(connectionBaseplate.Connection):
-    def __init__(self, host, port, timeout = 10):
+    def __init__(self, host, port, updateCallback, timeout = 10):
         '''
         Client with some error handling
         Leave host blank for localhost
@@ -16,6 +18,12 @@ class Client(connectionBaseplate.Connection):
         self.connected = False
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.timeout = timeout
+        self.socket.settimeout(self.timeout)
+
+        self.updateCallback = updateCallback
+
+        self.updateListener = threading.Thread(target = self.listen_for_updates, daemon = True)
+        self.updateListener.start()
 
         super().__init__(self.socket, connected = self.connected, timeout = self.timeout)
 
@@ -55,13 +63,6 @@ class Client(connectionBaseplate.Connection):
         self.messageToSend = str(message) + str(delimiter)
 
         self.sendall_with_errorlog(self.messageToSend.encode(encoding))
-        try:
-            self.responseString = self.receive_response(delimiter, encoding, response_chunk_size)
-            self.response = json.loads(self.responseString)
-        except Exception as e:
-            print(f'Error when receiving response: {e}')
-            self.response = {"status": 0}
-        return self.response
 
     def receive_response(self, delimiter = '\\n', encoding = 'utf-8', chunk_size = 1024):
         self.response_received = ''
@@ -85,6 +86,18 @@ class Client(connectionBaseplate.Connection):
                 break
 
         return self.response_received
+    
+    def listen_for_updates(self):
+        while True:
+            if self.isConnected():
+                try:
+                    response = self.receive_response()
+                    self.updateCallback(response)
+                except Exception as e:
+                    print(f'Error when listening for updates: {e}')
+            else:
+                print("Can't listen for updates, not connected! Retrying in 5 seconds...")
+                sleep(5)
 
     def set_host(self, host):
         self.host = host
