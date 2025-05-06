@@ -41,7 +41,7 @@ class Function:
         self.vars_in_expr = list(expr.free_symbols) # Find all possible variables in expression
 
         # Filter out contants in math
-        ignored_symbols = {'e', 'p', 'i'}
+        ignored_symbols = {'e'}
         filtered_vars = [v for v in self.vars_in_expr if str(v) not in ignored_symbols]
 
         return str(filtered_vars[0]) if filtered_vars else "x"
@@ -64,8 +64,10 @@ class Function:
                 i += len(matched_func)
                 
                 # Check if function is immediately followed by a variable and fix syntax
-                if i < len(expr) and expr[i].isalpha():
+                if i < len(expr) and expr[i].isalpha() and not "pi":
                     result += "(" + expr[i] + ")"
+                    i += 1
+                elif i < len(expr) and expr[i].isalpha():
                     i += 1
                 continue
 
