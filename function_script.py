@@ -48,7 +48,7 @@ class Function:
 
 
     def fix_multiplication(self, expr):
-        known_funcs = ['sin', 'cos', 'tan', 'exp', 'log', 'sqrt']
+        known_funcs = ['sin', 'cos', 'tan', 'exp', 'log', 'sqrt', "pi"]
         i = 0
         result = ""
         while i < len(expr):
