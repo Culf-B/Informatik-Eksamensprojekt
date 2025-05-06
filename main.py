@@ -28,13 +28,9 @@ def updateCallback(data):
     try:
         print(f'Data received: {data}')
         objectifiedData = json.loads(data)
-        print("test 1")
         if objectifiedData["status"] == 200:
-            print("test 2")
             functionManager.delete_all_functions()
-            print("test 3")
             for functionString in objectifiedData["content"]:
-                print("test 4", functionString)
                 functionManager.choose_action(functionString)
 
         isFunctionlistUpdated = True
