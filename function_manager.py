@@ -49,6 +49,13 @@ class Function_Manager:
     def delete_all_functions(self):
         self.function_list = []
 
+    def delete_by_string(self, string):
+        for i, function in enumerate(self.function_list):
+            if f'{function.func_name}({function.var}) = {function.func}' == string:
+                del self.function_list[i]
+                return True
+        return False
+
 if __name__ == '__main__':
     fm = Function_Manager()
     fm.choose_action("f(x) = 5x")

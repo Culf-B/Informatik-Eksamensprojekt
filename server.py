@@ -97,6 +97,7 @@ class Server:
                     "status": 200,
                     "content": self.function_manager.get_function_strings()
                 }
+
             elif loadedRequest["action"] == "POST":
                 self.function_manager.choose_action(loadedRequest["content"])
                 responseObject = {
@@ -107,6 +108,22 @@ class Server:
                     if client.connected:
                         client.serverToClientComms(json.dumps(responseObject))
                 responseObject = None
+
+            elif loadedRequest["action"] == "DELETE":
+                delete_status = self.function_manager.delete_by_string(loadedRequest["content"])
+                if delete_status == False:
+                    responseObject = {
+                        "status": 404
+                    }
+                else:
+                    responseObject = {
+                        "status": 200,
+                        "content": self.function_manager.get_function_strings()
+                    }
+                    for client in self.connectedClients:
+                        if client.connected:
+                            client.serverToClientComms(json.dumps(responseObject))
+                    responseObject = None
             else:
                 responseObject = {
                     "status": 404

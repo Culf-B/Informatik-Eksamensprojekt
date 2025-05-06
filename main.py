@@ -86,6 +86,15 @@ while run:
                         }
                     )
                 )
+        elif event.type == pygame_gui.UI_BUTTON_PRESSED and event.ui_element in ui.functionLabels:
+            connectionClient.request(
+                json.dumps(
+                    {
+                        "action": "DELETE",
+                        "content": event.ui_element.text
+                    }
+                )
+            )
 
         # Pass events onto UIHandlers eventhandler
         ui.handleEvent(event)

@@ -120,6 +120,7 @@ class UiHandler:
                 else:
                     self.inputWindow.show()
                     self.showInputWindowButton.set_text("Skjul funktions vindue")
+
         elif event.type == pygame_gui.UI_WINDOW_CLOSE:
             if event.ui_element == self.inputWindow:
                 self.showInputWindowButton.set_text("Vis funktions vindue")
@@ -161,7 +162,7 @@ class UiHandler:
         for i in range(len(functionList)):
             # Add UI label
             self.functionLabels.append(
-                pygame_gui.elements.ui_label.UILabel(
+                pygame_gui.elements.ui_button.UIButton(
                     relative_rect = pygame.Rect((0, 50 * i), (300, 50)),
                     text = f'{functionList[i].func_name}({functionList[i].var_name}) = {functionList[i].func}',
                     manager = self.manager,
