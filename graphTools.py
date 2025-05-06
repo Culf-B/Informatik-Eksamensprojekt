@@ -17,9 +17,52 @@ class Axis(RenderObject):
         super().__init__()
 
     # Tegner linjerne 
-    def draw(self, screen, pos_x, pos_y, zoom, size, camera):
-        pygame.draw.line(screen, "Black", (size[0] / 2 - pos_x * zoom, 0), (size[0] / 2 - pos_x * zoom, size[1]))
-        pygame.draw.line(screen, "Black", (0, size[1] / 2 - pos_y * zoom), (size[0], size[1] / 2 - pos_y * zoom))
+    def draw(self, screen, pos_x, pos_y, zoom, size, camera,):
+        self.ox = size[0] / 2 - pos_x * zoom
+        self.oy = size[1] / 2 - pos_y * zoom
+        pygame.draw.line(screen, "Black", (self.ox, 0), (self.ox, size[1]))
+        pygame.draw.line(screen, "Black", (0,self.oy ), (size[0], self.oy))
+         # Indstillinger for ticks
+        min_px     = 80           # mindste afstand i pixels mellem to labels
+        world_step = 1            # start med 1 verdens-enhed
+        # gang med 5 indtil labels er mindst min_px pixels fra hinanden
+        while world_step * zoom < min_px:
+            world_step *= 5
+        PIXEL_INTERVAL = int(world_step * zoom)  # én world_step i pixels
+        PIXEL_INTERVAL = max(PIXEL_INTERVAL, 1)
+        # afstand mellem ticks i pixels
+        TICK_SIZE      = 5      # halve tick-længde i pixels
+        COLOR          = (0,0,0)  
+         # --- Font til tal ---
+        font = pygame.font.SysFont(None, 18) # størelsen for fontet 
+        text_color = (0, 0, 0)
+
+        # --- X-aksens ticks ---
+        # Beregn offset, så ticks følger origo
+        offset_x = int(self.ox % PIXEL_INTERVAL)
+        for x in range(offset_x, int(size[0]), PIXEL_INTERVAL):
+            start = (x, self.oy - TICK_SIZE)
+            end   = (x, self.oy + TICK_SIZE)
+            pygame.draw.line(screen, COLOR, start, end, 1)
+            #beregner tallet der sættes på ticks for x 
+            val = (x - self.ox) / zoom
+            txt_surf = font.render(str(int(val)), True, text_color)
+            txt_rect = txt_surf.get_rect(           # <-- definer txt_rect her
+            midtop=(x, self.oy + TICK_SIZE + 2))
+            screen.blit(txt_surf, txt_rect)
+
+        # --- Y-aksens ticks ---
+        offset_y = int(self.oy % PIXEL_INTERVAL)
+        for y in range(offset_y, int(size[1]), PIXEL_INTERVAL):
+            start = (self.ox - TICK_SIZE, y)
+            end   = (self.ox + TICK_SIZE, y)
+            pygame.draw.line(screen, COLOR, start, end, 1)
+            #beregner tallet der sættes på ticks for y
+            val = -(y - self.oy) / zoom
+            txt_surf = font.render(str(int(val)), True, text_color)
+            txt_rect = txt_surf.get_rect(midright=(self.ox - TICK_SIZE - 2, y))
+            screen.blit(txt_surf, txt_rect)
+
 
 class Function(RenderObject):
     def __init__(self, functionObject, resolution = 100):
