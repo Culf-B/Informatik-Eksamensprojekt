@@ -111,16 +111,12 @@ class Function(RenderObject):
             self.prevScreenPos = self.screenPos
 
 class Camera:
-    def __init__(self, pos = [0, 0], zoomAmount = 1, size = [500, 500]):
+    def __init__(self, pos = [0, 0], zoom = 1, size = [500, 500]):
         self.pos = pos
-        self.zoomAmount = zoomAmount
         self.moveSpeed = 10
         
         # Calculate actual zoom scaling level
-        if self.zoomAmount > 0:
-            self.zoom = 1 / abs(self.zoomAmount)
-        else:
-            self.zoom = abs(self.zoomAmount)
+        self.zoom = zoom
 
         self.size = size
         self.surface = pygame.surface.Surface(self.size)
@@ -166,17 +162,10 @@ class Camera:
             if self.collisionRect.collidepoint(self.mousePos):
                 self.beforePos = self.getPosFromScreenCoords(self.mousePos)
 
-                # Apply zoom without getting zoomAmount = 0
-                if self.zoomAmount != event.y:
-                    self.zoomAmount -= event.y
-                else:
-                    self.zoomAmount -= 2 * event.y
-
-                # Calculate actual zoom scaling level
-                if self.zoomAmount > 0:
-                    self.zoom = 1 / abs(self.zoomAmount)
-                else:
-                    self.zoom = abs(self.zoomAmount)
+                if event.y > 0:
+                    self.zoom = self.zoom + self.zoom * 0.2
+                elif event.y < 0:
+                    self.zoom = self.zoom - self.zoom * 0.2
 
                 self.afterPos = self.getPosFromScreenCoords(self.mousePos)
 
