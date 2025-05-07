@@ -1,6 +1,6 @@
 import pygame
 pygame.init()
-
+print("test")
 class RenderObject:
     def __init__(self):
         pass
