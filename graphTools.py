@@ -8,10 +8,7 @@ class RenderObject:
     def draw(self, screen, pos_x, pos_y, zoom, size, camera):
         pass
 
-class Grid(RenderObject):
-    def __init__(self):
-        pass
-    
+
 class Axis(RenderObject):
     def __init__(self):
         super().__init__()
@@ -20,9 +17,7 @@ class Axis(RenderObject):
     def draw(self, screen, pos_x, pos_y, zoom, size, camera,):
         self.ox = size[0] / 2 - pos_x * zoom
         self.oy = size[1] / 2 - pos_y * zoom
-        pygame.draw.line(screen, "Black", (self.ox, 0), (self.ox, size[1]))
-        pygame.draw.line(screen, "Black", (0,self.oy ), (size[0], self.oy))
-         # Indstillinger for ticks
+                 # Indstillinger for ticks
         min_px     = 80           # mindste afstand i pixels mellem to labels
         world_step = 1            # start med 1 verdens-enhed
         # gang med 5 indtil labels er mindst min_px pixels fra hinanden
@@ -36,6 +31,19 @@ class Axis(RenderObject):
          # --- Font til tal ---
         font = pygame.font.SysFont(None, 18) # størelsen for fontet 
         text_color = (0, 0, 0)
+        
+             # <-- Grid-linjer (let grå) -->
+        offset_x = int(self.ox % PIXEL_INTERVAL)
+        offset_y = int(self.oy % PIXEL_INTERVAL)
+        for x in range(offset_x, int(size[0]), PIXEL_INTERVAL):
+            pygame.draw.line(screen, (230,230,230), (x, 0), (x, size[1]), 1)
+        for y in range(offset_y, int(size[1]), PIXEL_INTERVAL):
+            pygame.draw.line(screen, (230,230,230), (0, y), (size[0], y), 1)
+        pygame.draw.line(screen, "Black", (self.ox, 0), (self.ox, size[1]))
+        pygame.draw.line(screen, "Black", (0,self.oy ), (size[0], self.oy))
+
+
+        
 
         # --- X-aksens ticks ---
         # Beregn offset, så ticks følger origo
@@ -62,6 +70,8 @@ class Axis(RenderObject):
             txt_surf = font.render(str(int(val)), True, text_color)
             txt_rect = txt_surf.get_rect(midright=(self.ox - TICK_SIZE - 2, y))
             screen.blit(txt_surf, txt_rect)
+
+
 
 
 class Function(RenderObject):
