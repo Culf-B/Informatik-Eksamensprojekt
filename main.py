@@ -8,7 +8,7 @@ import function_manager
 from networking import client
 
 screen = pygame.display.set_mode([800, 450])
-pygame.display.set_caption("CoCAS")
+pygame.display.set_caption("Multiplot")
 clock = pygame.time.Clock()
 run = True
 
