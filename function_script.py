@@ -40,8 +40,8 @@ class Function:
         expr = sympify(self.fix_multiplication(expression_str))
         self.vars_in_expr = list(expr.free_symbols) # Find all possible variables in expression
 
-        # Filter out contants in math
-        ignored_symbols = {'e'}
+        # Filter out contants in math from sympy symbols
+        ignored_symbols = ['e']
         filtered_vars = [v for v in self.vars_in_expr if str(v) not in ignored_symbols]
 
         return str(filtered_vars[0]) if filtered_vars else "x"
