@@ -29,8 +29,11 @@ class Function_Manager:
             self.make_new_function(input)
         
     def make_new_function(self, input):
-        func = fs.Function(input, self)
-        self.function_list.append(func)
+        try:
+            func = fs.Function(input, self)
+            self.function_list.append(func)
+        except Exception as e:
+                    print("Error at: ", e)
         
     def change_function(self, input, index):
         existing_name = self.function_list[index].func_name
