@@ -54,7 +54,7 @@ class Client(connectionBaseplate.Connection):
         except Exception as e:
             print(f"An unexpected error occurred: {e}")
 
-    def request(self, message, delimiter = '\\n', encoding = 'utf-8', response_chunk_size = 1024):
+    def request(self, message, delimiter = '\\n', encoding = 'utf-8'):
         print("Sending request...")
         if not self.connected:
             print("Was not connected to server, trying to connect...")
