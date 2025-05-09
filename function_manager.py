@@ -12,7 +12,8 @@ class Function_Manager:
             lhs = input.split("=")[0]
             func_name = lhs[0]  # 'f' in "f(x)"
         else:
-            self.make_new_function
+            self.make_new_function(input)
+            return
 
         print(func_name)
 
@@ -33,7 +34,7 @@ class Function_Manager:
             func = fs.Function(input, self)
             self.function_list.append(func)
         except Exception as e:
-                    print("Error at: ", e)
+            print("Error at: ", e)
         
     def change_function(self, input, index):
         existing_name = self.function_list[index].func_name
@@ -53,10 +54,17 @@ class Function_Manager:
         self.function_list = []
 
     def delete_by_string(self, string):
+        print("Starting deletion by string: ", string)
+        self.temp_func_name = string[0]
+        print("Function to delete: ", self.temp_func_name)
         for i, function in enumerate(self.function_list):
-            if f'{function.func_name}({function.var}) = {function.func}' == string:
+            print("Current func name: ", function.func_name)
+            if function.func_name == self.temp_func_name:
+                print("Match found!", function.func_name, self.temp_func_name, i)
                 del self.function_list[i]
+                print("Done deleting!")
                 return True
+        print("No match found!")
         return False
 
 if __name__ == '__main__':

@@ -87,7 +87,7 @@ class Function:
         existing_names = [func.func_name for func in self.manager.get_functions() if func.func_name] # Get existing names
     
         # Give next available name to current function
-        start_index = ord('f')
+        start_index = ord(base)
         for i in range(start_index, ord('z') + 1):
             letter = chr(i)
             if letter not in existing_names:
